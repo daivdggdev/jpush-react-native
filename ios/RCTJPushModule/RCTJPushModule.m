@@ -16,6 +16,7 @@
 #define EXTRAS     @"extras"
 #define BADGE      @"badge"
 #define RING       @"ring"
+#define FIRE_TIME  @"fireTime"
 
 //本地角标
 #define APP_BADGE @"appBadge"
@@ -290,21 +291,39 @@ RCT_EXPORT_METHOD(addNotification:(NSDictionary *)params)
     JPushNotificationContent *content = [[JPushNotificationContent alloc] init];
     NSString *notificationTitle = params[TITLE]?params[TITLE]:@"";
     NSString *notificationContent = params[CONTENT]?params[CONTENT]:@"";
+    NSString *fireTime = params[FIRE_TIME]?params[FIRE_TIME]:NULL;
+    NSNumber *badge = params[BADGE]?params[BADGE]:@1;
     content.title = notificationTitle;
     content.body = notificationContent;
+    content.badge = badge;
     if(params[EXTRAS]){
         content.userInfo = @{MESSAGE_ID:messageID,TITLE:notificationTitle,CONTENT:notificationContent,EXTRAS:params[EXTRAS]};
     }else{
         content.userInfo = @{MESSAGE_ID:messageID,TITLE:notificationTitle,CONTENT:notificationContent};
     }
+
+    NSDateComponents *components = NULL;
     JPushNotificationTrigger *trigger = [[JPushNotificationTrigger alloc] init];
-    NSDateComponents *components = [[NSDateComponents alloc] init];
-    NSDate *now = [NSDate date];
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSUInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
-    NSDateComponents *dateComponent = [calendar components:unitFlags fromDate:now];
-    components = dateComponent;
-    components.second = [dateComponent second]+1;
+
+    if (fireTime) {
+        NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
+        [formatter setDateFormat:@"YYYY-MM-DD HH:mm:ss"];
+        NSDate * date = [formatter dateFromString:fireTime];
+        components = [[NSCalendar currentCalendar]
+                            components:NSCalendarUnitHour |
+                                       NSCalendarUnitMinute |
+                                       NSCalendarUnitSecond
+                            fromDate:date];
+    } else {
+        components = [[NSDateComponents alloc] init];
+        NSDate *now = [NSDate date];
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSUInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+        NSDateComponents *dateComponent = [calendar components:unitFlags fromDate:now];
+        components = dateComponent;
+        components.second = [dateComponent second]+1;
+    }
+
     if (@available(iOS 10.0, *)) {
         trigger.dateComponents = components;
     } else {
