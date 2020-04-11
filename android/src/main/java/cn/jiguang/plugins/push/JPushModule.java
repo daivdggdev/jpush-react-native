@@ -382,6 +382,12 @@ public class JPushModule extends ReactContextBaseJavaModule {
         notification.setNotificationId(id);
         notification.setTitle(notificationTitle);
         notification.setContent(notificationContent);
+
+        if (readableMap.hasKey(JConstants.FIRE_TIME)) {
+            long timestamp = Long.parseLong(readableMap.getString(JConstants.FIRE_TIME));
+            notification.setBroadcastTime(timestamp);
+        }
+        
         if (readableMap.hasKey(JConstants.EXTRAS)) {
             ReadableMap notificationExtra = readableMap.getMap(JConstants.EXTRAS);
             JSONObject notificationExtraJson = new JSONObject(notificationExtra.toHashMap());

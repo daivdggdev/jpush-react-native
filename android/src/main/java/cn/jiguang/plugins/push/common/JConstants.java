@@ -26,6 +26,7 @@ public class JConstants {
     public static final String TITLE = "title";
     public static final String CONTENT = "content";
     public static final String EXTRAS = "extras";
+    public static final String FIRE_TIME = "fireTime";
     //消息事件
     public static final String NOTIFICATION_ARRIVED = "notificationArrived";
     public static final String NOTIFICATION_OPENED = "notificationOpened";
